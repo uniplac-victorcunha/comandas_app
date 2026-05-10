@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(& \"C:\\\\Program Files\\\\nodejs\\\\node.exe\" --version)",
-      "PowerShell(& \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" --version)"
-    ]
-  }
-}
