@@ -14,6 +14,9 @@ const ClienteForm = lazy(() => import("../pages/ClienteForm"));
 const ProdutoList = lazy(() => import("../pages/ProdutoList"));
 const ProdutoForm = lazy(() => import("../pages/ProdutoForm"));
 const ProdutoListPublic = lazy(() => import("../pages/ProdutoListPublic"));
+const ComandaList = lazy(() => import("../pages/ComandaList"));
+const ComandaForm = lazy(() => import("../pages/ComandaForm"));
+const ComandaConsumoForm = lazy(() => import("../pages/ComandaConsumoForm"));
 const LoginForm = lazy(() => import("../components/forms/LoginForm"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 // Loader para o Suspense - melhora a experiência do usuário em aplicações maiores.
@@ -46,6 +49,11 @@ return (
 <Route path="/clientes" element={<PrivateRoute><ClienteList /></PrivateRoute>} />
 <Route path="/cliente" element={<PrivateRoute><ClienteForm /></PrivateRoute>} />
 <Route path="/cliente/:opr/:id" element={<PrivateRoute><ClienteForm /></PrivateRoute>} />
+{/* Rotas para comanda - somente se estiver logado */}
+<Route path="/comandas" element={<PrivateRoute><ComandaList /></PrivateRoute>} />
+<Route path="/comanda" element={<PrivateRoute><ComandaForm /></PrivateRoute>} />
+<Route path="/comanda/:opr/:id" element={<PrivateRoute><ComandaForm /></PrivateRoute>} />
+<Route path="/comanda/consumo/:id" element={<PrivateRoute><ComandaConsumoForm /></PrivateRoute>} />
 {/* Rota para páginas não encontradas */}
 <Route path="*" element={<NotFound />} />
 </Routes>
