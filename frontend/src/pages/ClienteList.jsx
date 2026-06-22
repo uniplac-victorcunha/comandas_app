@@ -10,10 +10,14 @@ import { clienteService } from '../services/clienteService';
 import { useMasks } from '../hooks/useMasks';
 import showSnackbar from '../utils/snackbar';
 import showConfirm from '../utils/confirm';
+import { useAuth } from '../context/AuthContext';
+import { USER_GROUPS } from '../constants/userGroups';
 // Definição do componente ClienteList
 function ClienteList() {
   // Hook de navegação
   const navigate = useNavigate();
+  // Hook de autenticação
+  const { user } = useAuth();
   // Hook de máscaras
   const { applyCpfMask, applyPhoneMask } = useMasks();
   // Estados do componente
@@ -58,11 +62,11 @@ function ClienteList() {
     );
   };
   // Configuração de ações da página
-  const actions = (
+  const actions = (user?.grupo === USER_GROUPS.ADMINISTRADOR || user?.grupo === USER_GROUPS.CAIXA) ? (
     <Button variant="contained" color="primary" onClick={() => navigate('/cliente')} startIcon={<FiberNew />} sx={{ fontWeight: 600, px: 2, py: 1 }}>
       Novo
     </Button>
-  );
+  ) : null;
 
   // Efeito para carregar clientes
   useEffect(() => {
@@ -88,7 +92,7 @@ function ClienteList() {
     { field: 'nome', headerName: 'Nome' },
     { field: 'cpf', headerName: 'CPF' },
     { field: 'telefone', headerName: 'Telefone' },
-    { field: 'actions', headerName: 'Ações', renderCell: (params) => <ActionButtons onView={handleView} onEdit={handleEdit} onDelete={handleDelete} item={params.row || {}} /> }
+    { field: 'actions', headerName: 'Ações', renderCell: (params) => <ActionButtons onView={handleView} onEdit={(user?.grupo === USER_GROUPS.ADMINISTRADOR || user?.grupo === USER_GROUPS.CAIXA) ? handleEdit : null} onDelete={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleDelete : null} item={params.row || {}} /> }
   ];
 
   // Renderização desktop: linha da tabela
@@ -101,7 +105,12 @@ function ClienteList() {
         if (column.field === 'telefone') return <TableCell key={index}>{applyPhoneMask(cliente.telefone)}</TableCell>;
         if (column.field === 'actions') return (
           <TableCell key={index}>
-            <ActionButtons onView={handleView} onEdit={handleEdit} onDelete={handleDelete} item={cliente} />
+            <ActionButtons
+              onView={handleView}
+              onEdit={(user?.grupo === USER_GROUPS.ADMINISTRADOR || user?.grupo === USER_GROUPS.CAIXA) ? handleEdit : null}
+              onDelete={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleDelete : null}
+              item={cliente}
+            />
           </TableCell>
         );
         return null;
@@ -136,8 +145,8 @@ function ClienteList() {
           <ActionButtons
             item={cliente}
             onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+            onEdit={(user?.grupo === USER_GROUPS.ADMINISTRADOR || user?.grupo === USER_GROUPS.CAIXA) ? handleEdit : null}
+            onDelete={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleDelete : null}
           />
         </Box>
       </CardContent>

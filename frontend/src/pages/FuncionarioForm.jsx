@@ -5,15 +5,18 @@ import { TextField, Button, Box, CircularProgress, Typography, MenuItem } from '
 import PageLayout from "../components/common/PageLayout";
 import { useValidationRules } from '../hooks/useValidationRules';
 import { useMasks } from '../hooks/useMasks';
-import { GROUP_OPTIONS } from '../constants/userGroups';
+import { GROUP_OPTIONS, USER_GROUPS } from '../constants/userGroups';
 import { funcionarioService } from '../services/funcionarioService';
 import showSnackbar from '../utils/snackbar';
 import UniqueValidator, { useFieldValidation } from '../components/common/UniqueValidator';
+import { useAuth } from '../context/AuthContext';
 // Definição do componente FuncionarioForm
 const FuncionarioForm = () => {
   // Hooks de navegação e parâmetros
   const { id, opr } = useParams(); // Parâmetros da URL: id e operação (edit/view)
   const navigate = useNavigate(); // Navegação entre páginas
+  // Hook de autenticação
+  const { user } = useAuth();
   // Hook de formulário
   const { control, handleSubmit, formState: { errors, dirtyFields }, reset } = useForm();
   // Estados do componente
@@ -86,8 +89,14 @@ const FuncionarioForm = () => {
     }
   };
 
-  // Efeito para carregar dados do funcionário
+  // Efeito para carregar dados do funcionário e verificar permissões
   useEffect(() => {
+    // Se não for modo de apenas visualização e o usuário não for administrador, barra o acesso
+    if (opr !== 'view' && user?.grupo !== USER_GROUPS.ADMINISTRADOR) {
+      showSnackbar('Acesso negado: Apenas administradores podem cadastrar ou editar funcionários.', 'warning');
+      navigate('/home');
+      return;
+    }
     const loadFuncionario = async () => {
       if (id) {
         try {
@@ -105,7 +114,7 @@ const FuncionarioForm = () => {
       }
     };
     loadFuncionario();
-  }, [id, navigate]);
+  }, [id, opr, user, navigate]);
 
   // Renderiza o formulário
   return (

@@ -9,10 +9,14 @@ import Pagination from '../components/common/Pagination';
 import { produtoService } from '../services/produtoService';
 import showSnackbar from '../utils/snackbar';
 import showConfirm from '../utils/confirm';
+import { useAuth } from '../context/AuthContext';
+import { USER_GROUPS } from '../constants/userGroups';
 // Definição do componente ProdutoList
 function ProdutoList() {
   // Hook de navegação
   const navigate = useNavigate();
+  // Hook de autenticação
+  const { user } = useAuth();
   // Estados do componente
   const [produtos, setProdutos] = useState([]); // Lista de produtos da API
   const [loading, setLoading] = useState(true); // Estado de carregamento
@@ -58,11 +62,11 @@ function ProdutoList() {
   // Funções utilitárias
   const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   // Configuração de ações da página
-  const actions = (
+  const actions = user?.grupo === USER_GROUPS.ADMINISTRADOR ? (
     <Button variant="contained" color="primary" onClick={() => navigate('/produto')} startIcon={<FiberNew />} sx={{ fontWeight: 600, px: 2, py: 1 }}>
       Novo
     </Button>
-  );
+  ) : null;
 
   // Efeito para carregar produtos
   useEffect(() => {
@@ -88,7 +92,7 @@ function ProdutoList() {
     { field: 'nome', headerName: 'Nome' },
     { field: 'descricao', headerName: 'Descrição' },
     { field: 'valor_unitario', headerName: 'Valor Unitário' },
-    { field: 'actions', headerName: 'Ações', renderCell: (params) => <ActionButtons onView={handleView} onEdit={handleEdit} onDelete={handleDelete} item={params.row || {}} /> }
+    { field: 'actions', headerName: 'Ações', renderCell: (params) => <ActionButtons onView={handleView} onEdit={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleEdit : null} onDelete={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleDelete : null} item={params.row || {}} /> }
   ];
 
   // Renderização desktop: linha da tabela
@@ -122,7 +126,12 @@ function ProdutoList() {
         if (column.field === 'valor_unitario') return <TableCell key={index} sx={{ fontWeight: 600, color: 'success.main' }}>{formatCurrency(produto.valor_unitario)}</TableCell>;
         if (column.field === 'actions') return (
           <TableCell key={index}>
-            <ActionButtons onView={handleView} onEdit={handleEdit} onDelete={handleDelete} item={produto} />
+            <ActionButtons
+              onView={handleView}
+              onEdit={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleEdit : null}
+              onDelete={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleDelete : null}
+              item={produto}
+            />
           </TableCell>
         );
         return null;
@@ -180,8 +189,8 @@ function ProdutoList() {
           <ActionButtons
             item={produto}
             onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+            onEdit={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleEdit : null}
+            onDelete={user?.grupo === USER_GROUPS.ADMINISTRADOR ? handleDelete : null}
           />
         </Box>
       </CardContent>

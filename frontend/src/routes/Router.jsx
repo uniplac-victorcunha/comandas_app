@@ -42,9 +42,9 @@ return (
 <Route path="/produto" element={<PrivateRoute><ProdutoForm /></PrivateRoute>} />
 {/* Rota para editar ou visualizar com opr {view ou edit} e id dinâmico */}
 <Route path="/produto/:opr/:id" element={<PrivateRoute><ProdutoForm /></PrivateRoute>} />
-{/* Rotas para funcionário - somente se estiver logado */}
-<Route path="/funcionarios" element={<PrivateRoute><FuncionarioList /></PrivateRoute>} />
-<Route path="/funcionario" element={<PrivateRoute><FuncionarioForm /></PrivateRoute>} />
+{/* Rotas para funcionário - acesso exclusivo do grupo 1 (Administrador), exceto listar um */}
+<Route path="/funcionarios" element={<PrivateRoute allowedGroups={[1]}><FuncionarioList /></PrivateRoute>} />
+<Route path="/funcionario" element={<PrivateRoute allowedGroups={[1]}><FuncionarioForm /></PrivateRoute>} />
 <Route path="/funcionario/:opr/:id" element={<PrivateRoute><FuncionarioForm /></PrivateRoute>} />
 <Route path="/clientes" element={<PrivateRoute><ClienteList /></PrivateRoute>} />
 <Route path="/cliente" element={<PrivateRoute><ClienteForm /></PrivateRoute>} />

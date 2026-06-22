@@ -7,6 +7,7 @@ import { useValidationRules } from '../hooks/useValidationRules';
 import comandaService from '../services/comandaService';
 import showSnackbar from '../utils/snackbar';
 import { useAuth } from '../context/AuthContext';
+import { USER_GROUPS } from '../constants/userGroups';
 import ComandaValidator, { useComandaValidation } from '../components/common/ComandaValidator';
 // Definição do componente ComandaForm
 const ComandaForm = () => {
@@ -51,8 +52,14 @@ const ComandaForm = () => {
   const handleCancel = () => {
     navigate('/comandas');
   };
-  // Carregar dados da comanda para edição/visualização
+  // Carregar dados da comanda para edição/visualização e verificar permissões
   useEffect(() => {
+    // Se for edição (id válido, não 'new' e operação não é view) e o usuário não for administrador, barra o acesso
+    if (id && id !== 'new' && opr !== 'view' && user?.grupo !== USER_GROUPS.ADMINISTRADOR) {
+      showSnackbar('Acesso negado: Apenas administradores podem editar comandas.', 'warning');
+      navigate('/comandas');
+      return;
+    }
     const loadComanda = async () => {
       if (id && id !== 'new') {
         try {
@@ -79,7 +86,7 @@ const ComandaForm = () => {
       }
     };
     loadComanda();
-  }, [id, reset]);
+  }, [id, reset, opr, user, navigate]);
 
   // Função de salvamento
   const onSubmit = async (data) => {

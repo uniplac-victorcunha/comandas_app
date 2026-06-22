@@ -8,11 +8,15 @@ import { useMasks } from '../hooks/useMasks';
 import { clienteService } from '../services/clienteService';
 import showSnackbar from '../utils/snackbar';
 import UniqueValidator, { useFieldValidation } from '../components/common/UniqueValidator';
+import { useAuth } from '../context/AuthContext';
+import { USER_GROUPS } from '../constants/userGroups';
 // Definição do componente ClienteForm
 const ClienteForm = () => {
   // Hooks de navegação e parâmetros
   const { id, opr } = useParams(); // Parâmetros da URL: id e operação (edit/view)
   const navigate = useNavigate(); // Navegação entre páginas
+  // Hook de autenticação
+  const { user } = useAuth();
   // Hook de formulário
   const { control, handleSubmit, formState: { errors, dirtyFields }, reset } = useForm();
   // Estados do componente
@@ -81,8 +85,14 @@ const ClienteForm = () => {
     }
   };
 
-  // Efeito para carregar dados do cliente
+  // Efeito para carregar dados do cliente e verificar permissões
   useEffect(() => {
+    // Se não for modo de apenas visualização e o usuário não for Administrador (1) nem Caixa (3), barra o acesso
+    if (opr !== 'view' && user?.grupo !== USER_GROUPS.ADMINISTRADOR && user?.grupo !== USER_GROUPS.CAIXA) {
+      showSnackbar('Acesso negado: Apenas administradores e caixas podem cadastrar ou editar clientes.', 'warning');
+      navigate('/clientes');
+      return;
+    }
     const loadCliente = async () => {
       if (id) {
         try {
@@ -100,7 +110,7 @@ const ClienteForm = () => {
       }
     };
     loadCliente();
-  }, [id, navigate]);
+  }, [id, opr, user, navigate]);
 
   // Renderiza o formulário
   return (
