@@ -203,14 +203,16 @@ const ComandaForm = () => {
         <Controller
           name="cliente_id"
           control={control}
+          rules={{ pattern: { value: /^[0-9]+$/, message: 'Informe o ID numérico do cliente' } }}
           render={({ field }) => (
             <TextField
               {...field}
               value={field.value || ''}
               fullWidth
-              label="Identificação do Cliente (opcional)"
+              label="ID do Cliente (opcional)"
               margin="normal"
-              placeholder="Nome do cliente ou observações"
+              type="number"
+              placeholder="Número de identificação do cliente cadastrado"
               error={!!errors.cliente_id}
               helperText={errors.cliente_id?.message}
               disabled={loading || isReadOnly}

@@ -3,6 +3,7 @@ Typography,
 Box
 } from "@mui/material";
 import PageLayout from "../components/common/PageLayout";
+import VictorPhoto from "../assets/Victor.jpeg";
 const Dashboard = () => {
 return (
 <PageLayout title="Dashboard" maxWidth="xl">
@@ -18,6 +19,12 @@ month: 'long',
 day: 'numeric'
 })}`}
 </Typography>
+<Box
+component="img"
+src={VictorPhoto}
+alt="Victor"
+sx={{ mt: 2, width: 200, height: 200, borderRadius: '50%', objectFit: 'cover' }}
+/>
 </Box>
 </PageLayout>
 );

@@ -98,7 +98,11 @@ api.interceptors.response.use(
       }
     } else {
       // Códigos de erro da API, diferente de 401: 400, 403, 404, 500 - Capturar mensagem de erro da API (detail)
-      const errorMessage = error.response?.data?.detail || error.message || 'Erro desconhecido';
+      const detail = error.response?.data?.detail;
+      // Erros de validação (422) vêm como array de objetos {type, loc, msg, input}; converter para texto
+      const errorMessage = Array.isArray(detail)
+        ? detail.map((item) => item.msg || JSON.stringify(item)).join('; ')
+        : detail || error.message || 'Erro desconhecido';
       //console.log("Erro da API:", errorMessage); //console.log("Status:", error.response?.status); //console.log("Data:", error.response?.data);
       // Adicionar a mensagem de erro ao objeto error para uso posterior
       error.apiMessage = errorMessage;
